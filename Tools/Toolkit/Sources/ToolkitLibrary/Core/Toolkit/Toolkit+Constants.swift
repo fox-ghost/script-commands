@@ -7,7 +7,7 @@ import Foundation
 import TSCBasic
 
 public extension Toolkit {
-  internal var blockedFolderList: [String] {
+  var blockedFolderList: [String] {
     [
       ".git",
       "screenshots",
@@ -21,10 +21,16 @@ public extension Toolkit {
     ]
   }
 
+  var blockedFilesExtensionsList: [String] {
+    [
+      "txt",
+    ]
+  }
+
   static var information: (name: String, version: String) {
     (
       name: "Raycast Toolkit",
-      version: "0.3.1"
+      version: "0.4.0"
     )
   }
 

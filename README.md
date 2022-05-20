@@ -14,8 +14,13 @@
 
   <h1>Raycast Script Commands</h1>
 
-  [Raycast](https://raycast.com/) lets you control your tools with a few keystrokes and installing script commands makes it possible to execute commands from anywhere on your desktop. They are a great way to speed up every-day tasks such as converting data, opening bookmarks or triggering dev workflows. This repository contains some example scripts as well as links to our community commands and documentation to write your own ones.
 </div>
+
+[Raycast](https://raycast.com/) lets you control your tools with a few keystrokes and installing script commands makes it possible to execute commands from anywhere on your desktop. They are a great way to speed up every-day tasks such as converting data, opening bookmarks or triggering dev workflows. This repository contains some example scripts as well as links to our community commands and documentation to write your own ones.
+
+**✨ Looking to build richer extensions?** Check out the Extensions API [here](https://github.com/raycast/extensions).
+
+🚨 For anything that is not related to script commands, please [send us an email](mailto:feedback@raycast.com), use the feedback command within Raycast, or join the [Slack community](https://www.raycast.com/community).
 
 <br>
 <br>
@@ -29,11 +34,15 @@
 
 To install new commands, follow these steps:
 
-1. Choose your script from the [community repo](https://github.com/raycast/script-commands/tree/master/commands#apps) and save them into a new directory (alternatively, you can use the [_enabled-commands](https://github.com/raycast/script-commands/tree/master/_enabled-commands) folder for this).
-2. Open the Extensions tab in the Raycast preferences
-3. Click the plus button
-4. Click `Add Script Directory`
-5. Select directories containing your Script Commands
+1. Choose a script from the [community repo](https://github.com/raycast/script-commands/tree/master/commands#apps) and save it into a new directory.
+   
+   Scripts containing the word `.template.` in the filename require some values to be set (check [the troubleshouting section](#troubleshooting-and-faqs) for more information).
+   
+   Alternatively, instead of creating a new directory you can reuse the repo's [`_enable-commands` folder](https://github.com/raycast/script-commands/tree/master/_enabled-commands).
+3. Open the Extensions tab in the Raycast preferences
+4. Click the plus button
+5. Click `Add Script Directory`
+6. Select directories containing your Script Commands
 
 **💡 Hint:** We recommend that you don't directly load the community script directories into Raycast to avoid potential restructuring and new script commands suddenly appearing in Raycast.
 
@@ -54,7 +63,7 @@ To write your own custom Script Commands, go over the following steps:
 
 ### Metadata
 
-These parameters are available for you to customise your Script Command in Raycast. For practical examples of how these should be used, as well as best practices and supported languages, please browse our templates and community-built scripts.
+These parameters are available for you to customize your Script Command in Raycast. For practical examples of how these should be used, as well as best practices and supported languages, please browse our templates and community-built scripts.
 
 | Name                 | Description                                                                                                                                                                                                                                                                          | Required | App Version         |
 |----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|---------------------|
@@ -108,7 +117,7 @@ else
 <details>
   <summary>Can I build in a non-login shell?</summary>
 
-**We only allow Script Commands that run in a non-login shell in this repository as agreed on in our [contribution guidelines](https://github.com/raycast/script-commands/blob/master/CONTRIBUTING.md), due to any dependancies.**
+**We only allow Script Commands that run in a non-login shell in this repository as agreed on in our [contribution guidelines](https://github.com/raycast/script-commands/blob/master/CONTRIBUTING.md), due to any dependencies.**
 However, if you need to run your local script as login-shell, you can specify an argument after shebang, e.g. `#!/bin/bash -l` for bash. We also append `/usr/local/bin` to `$PATH` variable so you can use your local shell commands without any additional steps. If this is not enough, you can always extend `$PATH` by adding `export PATH='/some/extra/path:$PATH'` at the top of your script.
 </details>
 

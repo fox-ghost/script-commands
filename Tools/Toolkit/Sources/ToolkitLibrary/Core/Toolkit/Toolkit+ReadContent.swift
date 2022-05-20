@@ -7,8 +7,10 @@ import Foundation
 import TSCBasic
 
 extension Toolkit {
+  typealias FolderContent = (scriptCommands: ScriptCommands, readmePath: String?, groupName: String)
+
   @discardableResult
-  func readFolderContent(path: AbsolutePath, parentGroups: inout Groups, ignoreFilesInDir: Bool = false) throws -> ScriptCommands {
+  func readFolderContent(path: AbsolutePath, parentGroups: inout Groups, ignoreFilesInDir: Bool = false) throws -> FolderContent {
     var scriptCommands = ScriptCommands()
 
     for directory in onlyDirectories(at: path) {
@@ -23,39 +25,76 @@ extension Toolkit {
 
       var subGroups = Groups()
 
-      let values = try readFolderContent(path: directory, parentGroups: &subGroups)
+      let (scriptCommands, readmePath, groupName) = try readFolderContent(path: directory, parentGroups: &subGroups)
 
-      if values.isEmpty == false {
-        group.scriptCommands = values
+      if groupName.isEmpty == false, groupName.lowercased() == group.name.lowercased() {
+        group.name = groupName
+      }
+
+      if scriptCommands.isEmpty == false {
+        group.scriptCommands = scriptCommands
       }
 
       if subGroups.isEmpty == false {
         group.subGroups = subGroups
       }
 
-      parentGroups.append(group)
+      if let readmePath = readmePath {
+        group.readme = readmePath
+      }
+
+      if scriptCommands.isEmpty == false || subGroups.isEmpty == false {
+        parentGroups.append(group)
+      }
     }
 
-    for file in onlyFiles(at: path) {
+    let directoryFiles = onlyFiles(at: path)
+
+    var groupName = ""
+    var readmePath: String?
+
+    for file in directoryFiles where directoryFiles.isEmpty == false {
       guard ignoreFilesInDir == false else {
         continue
       }
 
-      if var scriptCommand = readScriptCommand(from: file) {
+      guard
+        let fileExtension = file.extension,
+        blockedFilesExtensionsList.contains(fileExtension) == false else {
+        continue
+      }
+
+      if file.basenameWithoutExt.lowercased() == "readme" {
+        guard let fileContent = readContentFile(from: file), fileContent.count > 0 else {
+          continue
+        }
+
+        let pathCount = dataManager.extensionsPathString.count + 1
+        readmePath = String(file.pathString.dropFirst(pathCount))
+      } else if var scriptCommand = readScriptCommand(from: file) {
         // This is to avoid data racing
         DispatchQueue.global(qos: .userInitiated).async {
           self.dataManager.increaseTotal()
+          self.dataManager.addLanguage(scriptCommand.language)
         }
 
         scriptCommand.configure(
           isExecutable: fileSystem.isExecutableFile(file)
         )
 
+        if let packageName = scriptCommand.packageName {
+          groupName = packageName
+        }
+
         scriptCommands.append(scriptCommand)
       }
     }
 
-    return scriptCommands
+    return (
+      scriptCommands: scriptCommands,
+      readmePath: readmePath,
+      groupName: groupName
+    )
   }
 
   func readContentFile(from path: AbsolutePath) -> String? {
@@ -71,7 +110,7 @@ extension Toolkit {
 
   func extractGitDates(from filePath: AbsolutePath) -> [String]? {
     do {
-      let dates = try self.git.run(
+      let dates = try git.run(
         "log", "--format=%aI", "--follow", filePath.basename,
         path: filePath
       )
@@ -106,7 +145,6 @@ extension Toolkit {
     let filenameKey = ScriptCommand.CodingKeys.filename.rawValue
     let packageNameKey = ScriptCommand.CodingKeys.packageName.rawValue
 
-    // TODO: Use the content of dictionary to implement the validation
     var dictionary = readKeyValues(of: content)
     dictionary[filenameKey] = filename
 
@@ -257,6 +295,19 @@ extension Toolkit {
       }
 
       if currentAuthor.keys.count == 2 {
+        guard let value = dictionary[key] as? String else {
+          continue
+        }
+
+        guard authors.contains(
+          where: {
+            $0[key] == value
+          }
+        ) == false else {
+          currentAuthor = [:]
+          continue
+        }
+
         authors.append(currentAuthor)
         currentAuthor = [:]
       }

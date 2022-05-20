@@ -5,6 +5,7 @@ A package of script commands to interact with [Bitwarden Vaults](https://bitward
 - [Dependencies](#dependencies)
 - [Authentication Command Usage](#authentication-command-usage)
   * [Log In](#log-in)
+  * [Log In with API Key](#log-in-with-api-key)
   * [Log Out](#log-out)
   * [Lock Session](#lock-session)
   * [Unlock Session](#unlock-session)
@@ -12,6 +13,7 @@ A package of script commands to interact with [Bitwarden Vaults](https://bitward
 - [Bitwarden Vault Command Usage](#bitwarden-vault-command-usage)
   * [Search Vault Items](#search-vault-items)
   * [Copy First Matching Password](#copy-first-matching-password)
+  * [Copy First Matching TOTP](#copy-first-matching-totp)
 - [Bitwarden Send Command Usage](#bitwarden-send-command-usage)
   * [Create a Text Send](#create-a-text-send)
   * [Receive a Text Send](#receive-a-text-send)
@@ -25,7 +27,7 @@ A package of script commands to interact with [Bitwarden Vaults](https://bitward
 
 ## Dependencies
 
-All authentication and vault-related commands in this package require the [Bitwarden CLI](https://bitwarden.com/help/article/cli/) v1.14.0 or later. Bitwarden Send-related commands require v1.15.1 or later. The _Bitwarden Status_, _Search Vault Items_, _Copy First Matching Password_, and Bitwarden Send-related commands (except _Delete a Send_) also require the [`jq` utility](https://stedolan.github.io/jq/).
+All authentication and vault-related commands in this package require the [Bitwarden CLI](https://bitwarden.com/help/article/cli/) v1.14.0 or later. Bitwarden Send-related commands require v1.15.1 or later. The _Bitwarden Status_, _Search Vault Items_, _Copy First Matching Password_, _Copy First Matching TOTP_, and Bitwarden Send-related commands (except _Delete a Send_) also require the [`jq` utility](https://stedolan.github.io/jq/).
 
 Install the latest version of both dependencies via homebrew:
 
@@ -43,7 +45,7 @@ Additional installation options are available in the tools' respective documenta
 
 This command executes in `silent` mode, and both authenticates and unlocks a Bitwarden account session.
 
-This is the only template command in the package. **If you use multifactor authentication to log in to your Bitwarden account, be sure to set the value of the `MFA_METHOD` variable.** The [values available to use](https://bitwarden.com/help/article/cli/#enums) are:
+**If you use multifactor authentication to log in to your Bitwarden account, be sure to set the value of the `MFA_METHOD` variable.** The [values available to use](https://bitwarden.com/help/article/cli/#enums) are:
 
 | MFA Method        | Value |
 |-------------------|:-----:|
@@ -52,6 +54,12 @@ This is the only template command in the package. **If you use multifactor authe
 | Yubikey           | 3     |
 
 If you _do not_ use multifactor authentication to log in to your Bitwarden account, leave this variable set to `""`, and optionally remove the MFA Code argument (or leave it blank when logging in). Enabling multifactor authentication is encouraged.
+
+### Log In with API Key
+
+<img src="./images/log-in-apikey.png">
+
+This command executes in `silent` mode, and both authenticates and unlocks a Bitwarden account session using an alternative authentication method required when Bitwarden thinks the authentication comes from bot traffic. See the [Bitwarden CLI documentation](https://bitwarden.com/help/article/cli-auth-challenges/) for more information. Be sure to set the values of the `BW_CLIENTID` and `BW_CLIENTSECRET` variables. These credentials can be found in the account settings of [the web vault](https://vault.bitwarden.com/#/settings/account) (in the "API Key" section).
 
 ### Log Out
 
@@ -121,6 +129,12 @@ Passwords and hidden fields are omitted by default. Pass `y` as the value of the
 <img src="./images/copy-first-matching-password.png">
 
 This command executes in `silent` mode, searches the unlocked Bitwarden vault, and copies the password associated with the first search result to the clipboard.
+
+### Copy First Matching TOTP
+
+<img src="./images/copy-first-matching-totp.png">
+
+This command executes in `silent` mode, searches the unlocked Bitwarden vault, and copies the TOTP associated with the first search result to the clipboard.
 
 ## Bitwarden Send Command Usage
 
